@@ -1,0 +1,18 @@
+# Rust
+/target/
+**/*.rs.bk
+
+# macOS
+.DS_Store
+
+# Environment
+.env
+
+# Editor / IDE
+.idea/
+*.swp
+*~
+
+# Claude Code local state (track context files)
+.claude/*
+!.claude/context/

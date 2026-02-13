@@ -54,6 +54,7 @@ crates/peon/            # peon — binary
 packs/                  # Sound packs (manifest.json + sounds/)
 scripts/install.sh      # Installer (curl|bash or local clone)
 scripts/uninstall.sh    # Uninstaller
+.github/                # CI/CD workflows, dependabot
 completions.bash        # Tab completion for bash/zsh
 config.json             # Default configuration
 skills/                 # Claude Code slash command (/peon-ping-toggle)
@@ -64,3 +65,4 @@ xtask/                  # Dev tooling (lint, hooks)
 
 - [Architecture & Event Pipeline](.claude/context/architecture.md)
 - [Sound Packs](.claude/context/sound-packs.md)
+- [CI/CD](.claude/context/ci.md)

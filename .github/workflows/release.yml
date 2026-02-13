@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (${{ matrix.target }})
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        include:
+          - target: aarch64-apple-darwin
+            asset_name: peon-aarch64-apple-darwin
+          - target: x86_64-apple-darwin
+            asset_name: peon-x86_64-apple-darwin
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Strip binary
+        run: strip target/${{ matrix.target }}/release/peon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: target/${{ matrix.target }}/release/peon
+
+  release:
+    name: Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare assets
+        run: |
+          mkdir -p release
+          for dir in artifacts/peon-*; do
+            name=$(basename "$dir")
+            cp "$dir/peon" "release/$name"
+            chmod +x "release/$name"
+          done
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          prev_tag=$(git tag --sort=-v:refname | sed -n '2p')
+          if [ -n "$prev_tag" ]; then
+            log=$(git log "$prev_tag"..HEAD --pretty=format:"- %s" --no-merges)
+          else
+            log=$(git log --pretty=format:"- %s" --no-merges)
+          fi
+          {
+            echo "changelog<<EOF"
+            echo "$log"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          body: |
+            ## Changes
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ## Installation
+
+            **macOS only** — requires `afplay` (built into macOS).
+
+            ### Quick install (recommended)
+
+            ```bash
+            curl -fsSL https://raw.githubusercontent.com/${{ github.repository }}/main/scripts/install.sh | bash
+            ```
+
+            ### Manual download
+
+            Download the binary for your architecture, make it executable, and place it in your `$PATH`:
+
+            ```bash
+            chmod +x peon-*
+            mv peon-* /usr/local/bin/peon
+            ```
+          files: release/*

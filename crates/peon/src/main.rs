@@ -23,16 +23,18 @@ fn main() -> ExitCode {
 
 fn run(cli: Cli) -> Result<(), Box<dyn std::error::Error>> {
     match cli.command {
-        Some(command) => run_command(command),
+        Some(command) => run_command(command, cli.packs_dir),
         None => {
-            // No subcommand — act as hook handler (read from stdin)
             hook::handle_hook()?;
             Ok(())
         }
     }
 }
 
-fn run_command(command: Commands) -> Result<(), Box<dyn std::error::Error>> {
+fn run_command(
+    command: Commands,
+    packs_dir_override: Option<std::path::PathBuf>,
+) -> Result<(), Box<dyn std::error::Error>> {
     match command {
         Commands::Pause => {
             let path = paths::paused_path();
@@ -74,9 +76,12 @@ fn run_command(command: Commands) -> Result<(), Box<dyn std::error::Error>> {
         }
         Commands::Packs => {
             let config = state_io::load_config(&paths::config_path());
-            let packs = state_io::list_packs(&paths::packs_dir());
+            let packs = state_io::list_packs(&paths::packs_dir(packs_dir_override.as_deref()));
             if packs.is_empty() {
-                println!("No packs found in {}", paths::packs_dir().display());
+                println!(
+                    "No packs found in {}",
+                    paths::packs_dir(packs_dir_override.as_deref()).display()
+                );
             } else {
                 for (name, manifest) in &packs {
                     let display = if manifest.display_name.is_empty() {
@@ -99,7 +104,7 @@ fn run_command(command: Commands) -> Result<(), Box<dyn std::error::Error>> {
         Commands::Pack { name } => {
             let config_path = paths::config_path();
             let mut config_map = state_io::load_config_map(&config_path);
-            let packs = state_io::list_packs(&paths::packs_dir());
+            let packs = state_io::list_packs(&paths::packs_dir(packs_dir_override.as_deref()));
             let pack_names: Vec<&str> = packs.iter().map(|(n, _)| n.as_str()).collect();
 
             let new_pack = match name {
@@ -144,6 +149,29 @@ fn run_command(command: Commands) -> Result<(), Box<dyn std::error::Error>> {
                 })
                 .unwrap_or(&new_pack);
             println!("peon-ping: switched to {new_pack} ({display})");
+        }
+        Commands::Sounds { name } => {
+            let packs_dir = paths::packs_dir(packs_dir_override.as_deref());
+            let config = state_io::load_config(&paths::config_path());
+
+            let pack_name = name.unwrap_or(config.active_pack);
+            let pack_path = packs_dir.join(&pack_name);
+
+            let manifest = state_io::load_manifest(&pack_path).map_err(|_| {
+                let available = state_io::list_packs(&packs_dir);
+                let names: Vec<&str> = available.iter().map(|(n, _)| n.as_str()).collect();
+                format!(
+                    "pack \"{}\" not found. Available: {}",
+                    pack_name,
+                    if names.is_empty() {
+                        "(none)".to_string()
+                    } else {
+                        names.join(", ")
+                    }
+                )
+            })?;
+
+            print!("{}", peon_core::format_pack_sounds(&manifest));
         }
     }
     Ok(())

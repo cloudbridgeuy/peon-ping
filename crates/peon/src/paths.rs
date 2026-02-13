@@ -26,6 +26,12 @@ pub fn paused_path() -> PathBuf {
     peon_dir().join(".paused")
 }
 
-pub fn packs_dir() -> PathBuf {
+pub fn packs_dir(cli_override: Option<&std::path::Path>) -> PathBuf {
+    if let Some(dir) = cli_override {
+        return dir.to_path_buf();
+    }
+    if let Ok(dir) = std::env::var("PEON_PACKS") {
+        return PathBuf::from(dir);
+    }
     peon_dir().join("packs")
 }

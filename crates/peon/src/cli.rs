@@ -1,5 +1,6 @@
 use crate::upgrade;
 use clap::{Parser, Subcommand};
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -7,6 +8,10 @@ use clap::{Parser, Subcommand};
     about = "Warcraft III Peon voice lines for Claude Code hooks"
 )]
 pub struct Cli {
+    /// Override packs directory (also: PEON_PACKS env var)
+    #[arg(long, global = true)]
+    pub packs_dir: Option<PathBuf>,
+
     #[command(subcommand)]
     pub command: Option<Commands>,
 }
@@ -26,6 +31,11 @@ pub enum Commands {
     /// Switch to a specific pack (or cycle if no name given)
     Pack {
         /// Pack name to switch to. Omit to cycle to next pack.
+        name: Option<String>,
+    },
+    /// Show categories and voice lines for a pack
+    Sounds {
+        /// Pack name to show. Omit for active pack.
         name: Option<String>,
     },
     /// Self-update peon from GitHub releases

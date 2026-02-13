@@ -92,7 +92,7 @@ pub fn handle_hook() -> Result<(), HookError> {
     }
 
     // Resolve active pack
-    let packs = state_io::list_packs(&paths::packs_dir());
+    let packs = state_io::list_packs(&paths::packs_dir(None));
     let available_pack_names: Vec<String> = packs.iter().map(|(name, _)| name.clone()).collect();
     let active_pack = resolve_pack(
         &config,
@@ -137,7 +137,7 @@ pub fn handle_hook() -> Result<(), HookError> {
                                 .insert(category.clone(), sound.file.clone());
                             state_dirty = true;
 
-                            let sound_path = paths::packs_dir()
+                            let sound_path = paths::packs_dir(None)
                                 .join(&active_pack)
                                 .join("sounds")
                                 .join(&sound.file);

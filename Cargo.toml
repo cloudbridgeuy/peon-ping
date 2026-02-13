@@ -21,7 +21,7 @@ serde_json = "1.0"
 thiserror = "2.0"
 rand = "0.8"
 dirs = "6.0"
-anstream = "0.6"
+anstream = "1.0"
 chrono = "0.4"
 tokio = { version = "1.0", features = ["full"] }
 peon_core = { path = "crates/core" }

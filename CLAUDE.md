@@ -44,7 +44,7 @@ cargo xtask release <version>  # Automated release (bump, tag, push, monitor CI)
 `peon` with no args = hook mode (reads JSON from stdin). Subcommands:
 
 ```
-peon pause | resume | toggle | status | packs | pack [name] | sounds [pack] | upgrade [--force]
+peon pause | resume | toggle | status | packs | pack [name] | sounds [pack] | play [category] [--pack name] | upgrade [--force]
 peon --packs-dir <path> <subcommand>  # override packs directory
 ```
 

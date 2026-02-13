@@ -8,6 +8,7 @@
 
 use clap::Parser;
 
+mod docs;
 mod lint;
 mod prelude;
 mod release;
@@ -47,6 +48,8 @@ impl Global {
 
 #[derive(Debug, clap::Subcommand)]
 enum Commands {
+    /// Generate SOUNDS.md from pack manifests
+    Docs(docs::DocsCommand),
     /// Code quality checks and git hooks management
     Lint(lint::LintCommand),
     /// Create a new release
@@ -58,6 +61,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
     match cli.command {
+        Commands::Docs(docs_cmd) => {
+            docs::run(docs_cmd, cli.global).await?;
+        }
         Commands::Lint(lint_cmd) => {
             lint::run(lint_cmd, cli.global).await?;
         }

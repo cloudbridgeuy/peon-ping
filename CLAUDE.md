@@ -18,7 +18,6 @@ cargo build                    # Build all crates
 cargo test                     # Run all tests (unit + integration)
 cargo xtask lint               # All quality checks (fmt, check, clippy, test, file-length)
 cargo xtask lint --fix         # Auto-fix formatting
-bats tests/                    # Run install script tests (requires bats-core)
 ```
 
 ## Conventions
@@ -53,12 +52,11 @@ Cargo.toml              # Workspace root
 crates/core/            # peon_core — pure library
 crates/peon/            # peon — binary
 packs/                  # Sound packs (manifest.json + sounds/)
-install.sh              # Installer (curl|bash or local clone)
-uninstall.sh            # Uninstaller
+scripts/install.sh      # Installer (curl|bash or local clone)
+scripts/uninstall.sh    # Uninstaller
 completions.bash        # Tab completion for bash/zsh
 config.json             # Default configuration
 skills/                 # Claude Code slash command (/peon-ping-toggle)
-tests/                  # Install script tests (bats)
 xtask/                  # Dev tooling (lint, hooks)
 ```
 

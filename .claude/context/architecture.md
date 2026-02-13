@@ -80,5 +80,4 @@ Save state (if dirty)
 ## Testing
 
 - **Unit tests** in `peon_core` — test routing, sound picking, agent detection, annoyed logic
-- **Integration tests** in `tests/install.bats` — test the install script (bats-core)
 - `CLAUDE_PEON_DIR` env var isolates tests from real config

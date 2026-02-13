@@ -13,20 +13,11 @@ BIN_NAME="peon"
 # All available sound packs (add new packs here)
 PACKS="peon peon_fr peon_pl peasant peasant_fr ra2_soviet_engineer sc_battlecruiser sc_kerrigan"
 
-# --- Platform detection ---
-detect_platform() {
-  case "$(uname -s)" in
-    Darwin) echo "mac" ;;
-    Linux)
-      if grep -qi microsoft /proc/version 2>/dev/null; then
-        echo "wsl"
-      else
-        echo "linux"
-      fi ;;
-    *) echo "unknown" ;;
-  esac
-}
-PLATFORM=$(detect_platform)
+# --- macOS guard ---
+if [ "$(uname -s)" != "Darwin" ]; then
+  echo "Error: peon-ping requires macOS"
+  exit 1
+fi
 
 detect_arch() {
   case "$(uname -m)" in
@@ -53,21 +44,9 @@ else
 fi
 
 # --- Prerequisites ---
-if [ "$PLATFORM" != "mac" ] && [ "$PLATFORM" != "wsl" ]; then
-  echo "Error: peon-ping requires macOS or WSL (Windows Subsystem for Linux)"
+if ! command -v afplay &>/dev/null; then
+  echo "Error: afplay is required (should be built into macOS)"
   exit 1
-fi
-
-if [ "$PLATFORM" = "mac" ]; then
-  if ! command -v afplay &>/dev/null; then
-    echo "Error: afplay is required (should be built into macOS)"
-    exit 1
-  fi
-elif [ "$PLATFORM" = "wsl" ]; then
-  if ! command -v powershell.exe &>/dev/null; then
-    echo "Error: powershell.exe is required (should be available in WSL)"
-    exit 1
-  fi
 fi
 
 if [ ! -d "$HOME/.claude" ]; then
@@ -78,7 +57,7 @@ fi
 # --- Detect if running from local clone ---
 SCRIPT_DIR=""
 if [ -n "${BASH_SOURCE[0]:-}" ] && [ "${BASH_SOURCE[0]}" != "bash" ]; then
-  CANDIDATE="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd)"
+  CANDIDATE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." 2>/dev/null && pwd)"
   if [ -f "$CANDIDATE/Cargo.toml" ]; then
     SCRIPT_DIR="$CANDIDATE"
   fi
@@ -95,13 +74,11 @@ elif [ -z "$SCRIPT_DIR" ]; then
   # Download pre-built binary from GitHub Releases
   echo "Downloading peon binary..."
   TARGET=""
-  case "$PLATFORM-$ARCH" in
-    mac-aarch64) TARGET="aarch64-apple-darwin" ;;
-    mac-x86_64)  TARGET="x86_64-apple-darwin" ;;
-    wsl-x86_64)  TARGET="x86_64-unknown-linux-gnu" ;;
-    wsl-aarch64) TARGET="aarch64-unknown-linux-gnu" ;;
+  case "$ARCH" in
+    aarch64) TARGET="aarch64-apple-darwin" ;;
+    x86_64)  TARGET="x86_64-apple-darwin" ;;
     *)
-      echo "Error: unsupported platform/arch: $PLATFORM/$ARCH"
+      echo "Error: unsupported architecture: $ARCH"
       exit 1
       ;;
   esac
@@ -133,8 +110,7 @@ if [ -n "$SCRIPT_DIR" ]; then
   # Local clone — copy files directly (including sounds)
   cp -r "$SCRIPT_DIR/packs/"* "$INSTALL_DIR/packs/"
   cp "$SCRIPT_DIR/completions.bash" "$INSTALL_DIR/"
-  [ -f "$SCRIPT_DIR/VERSION" ] && cp "$SCRIPT_DIR/VERSION" "$INSTALL_DIR/"
-  [ -f "$SCRIPT_DIR/uninstall.sh" ] && cp "$SCRIPT_DIR/uninstall.sh" "$INSTALL_DIR/"
+  [ -f "$SCRIPT_DIR/scripts/uninstall.sh" ] && cp "$SCRIPT_DIR/scripts/uninstall.sh" "$INSTALL_DIR/"
   if [ "$UPDATING" = false ]; then
     cp "$SCRIPT_DIR/config.json" "$INSTALL_DIR/"
   fi
@@ -142,8 +118,7 @@ else
   # curl|bash — download from GitHub
   echo "Downloading sound packs..."
   curl -fsSL "$REPO_BASE/completions.bash" -o "$INSTALL_DIR/completions.bash"
-  [ -z "$(curl -fsSL "$REPO_BASE/VERSION" 2>/dev/null)" ] || curl -fsSL "$REPO_BASE/VERSION" -o "$INSTALL_DIR/VERSION"
-  curl -fsSL "$REPO_BASE/uninstall.sh" -o "$INSTALL_DIR/uninstall.sh"
+  curl -fsSL "$REPO_BASE/scripts/uninstall.sh" -o "$INSTALL_DIR/uninstall.sh"
   for pack in $PACKS; do
     curl -fsSL "$REPO_BASE/packs/$pack/manifest.json" -o "$INSTALL_DIR/packs/$pack/manifest.json"
   done
@@ -298,22 +273,7 @@ fi
 PACK_DIR="$INSTALL_DIR/packs/$ACTIVE_PACK"
 TEST_SOUND=$({ ls "$PACK_DIR/sounds/"*.wav "$PACK_DIR/sounds/"*.mp3 "$PACK_DIR/sounds/"*.ogg 2>/dev/null || true; } | head -1)
 if [ -n "$TEST_SOUND" ]; then
-  if [ "$PLATFORM" = "mac" ]; then
-    afplay -v 0.3 "$TEST_SOUND"
-  elif [ "$PLATFORM" = "wsl" ]; then
-    wpath=$(wslpath -w "$TEST_SOUND")
-    wpath="${wpath//\\//}"
-    powershell.exe -NoProfile -NonInteractive -Command "
-      Add-Type -AssemblyName PresentationCore
-      \$p = New-Object System.Windows.Media.MediaPlayer
-      \$p.Open([Uri]::new('file:///$wpath'))
-      \$p.Volume = 0.3
-      Start-Sleep -Milliseconds 200
-      \$p.Play()
-      Start-Sleep -Seconds 3
-      \$p.Close()
-    " 2>/dev/null
-  fi
+  afplay -v 0.3 "$TEST_SOUND"
   echo "Sound working!"
 else
   echo "Warning: No sound files found. Sounds may not play."

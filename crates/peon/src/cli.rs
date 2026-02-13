@@ -46,6 +46,14 @@ pub enum Commands {
         #[arg(long)]
         pack: Option<String>,
     },
+    /// Download sound packs from GitHub
+    Pull {
+        /// Pack name to download. Required unless --all is used.
+        name: Option<String>,
+        /// Download all available packs
+        #[arg(long)]
+        all: bool,
+    },
     /// Self-update peon from GitHub releases
     Upgrade(upgrade::App),
 }

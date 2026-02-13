@@ -1,4 +1,5 @@
 mod cli;
+mod github;
 mod hook;
 mod paths;
 mod platform;
@@ -236,6 +237,36 @@ fn run_command(
                 None => {
                     return Err("no sounds in category".into());
                 }
+            }
+        }
+        Commands::Pull { name, all } => {
+            let packs_dir = paths::packs_dir(packs_dir_override.as_deref());
+            std::fs::create_dir_all(&packs_dir)?;
+
+            if all {
+                println!("Pulling all packs from GitHub...");
+                let remote_packs = github::list_remote_packs()?;
+                if remote_packs.is_empty() {
+                    return Err("no packs found on GitHub".into());
+                }
+                let mut installed = 0;
+                for pack_name in &remote_packs {
+                    match github::pull_pack(pack_name, &packs_dir) {
+                        Ok(result) => {
+                            println!("  {} ({} files)", result.name, result.files);
+                            installed += 1;
+                        }
+                        Err(e) => {
+                            eprintln!("  {} — failed: {}", pack_name, e);
+                        }
+                    }
+                }
+                println!("Installed {} packs.", installed);
+            } else {
+                let pack_name = name.ok_or("pack name required (or use --all)")?;
+                println!("Pulling pack '{pack_name}' from GitHub...");
+                let result = github::pull_pack(&pack_name, &packs_dir)?;
+                println!("Installed: {} ({} files)", result.name, result.files);
             }
         }
     }

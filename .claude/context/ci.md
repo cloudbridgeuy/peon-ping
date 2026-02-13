@@ -40,8 +40,28 @@ Both assign and request review from `guzmonne`.
 
 ## Release Process
 
-1. Bump version in both `crates/core/Cargo.toml` and `crates/peon/Cargo.toml`
-2. Commit and push to `main`
-3. Tag: `git tag v<version> && git push --tags`
-4. Release workflow builds binaries and creates GitHub release
-5. Users install via `curl | bash` which downloads from the latest release
+Automated via `cargo xtask release`:
+
+```bash
+cargo xtask release 2.1.0              # Full release
+cargo xtask release 2.1.0 --no-monitor # Skip workflow polling
+cargo xtask release 2.1.0 --auto-upgrade # Auto-run peon upgrade after
+cargo xtask release --cleanup v2.1.0   # Clean up a failed release
+```
+
+### What it does
+
+1. **Pre-flight checks**: gh CLI auth, on `main`, clean working dir, CI passed, valid semver, version is a bump
+2. **Version bump**: Updates `version` in root `Cargo.toml` `[workspace.package]` (both crates inherit via `version.workspace = true`)
+3. **Git operations**: `git add Cargo.toml Cargo.lock` → commit (`chore: bump version to X`) → annotated tag (`vX`) → push
+4. **Workflow monitoring**: Polls `gh run list` every 30s, max 30min timeout
+5. **Retry**: Up to 3 attempts — cleans up tag + rolls back version bump between retries
+6. **Post-release**: Optionally runs `peon upgrade` to update the local binary
+
+### Self-update
+
+Users can self-update via `peon upgrade` (or `peon upgrade --force`). Downloads the matching binary from the latest GitHub release and replaces the current executable with rollback on failure. Uses `ureq` (blocking HTTP) against the GitHub releases API.
+
+**GitHub repo**: `tonyyont/peon-ping`
+**API endpoint**: `https://api.github.com/repos/tonyyont/peon-ping/releases/latest`
+**Asset pattern**: `peon-{arch}-apple-darwin` (must match `release.yml` matrix)

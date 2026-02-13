@@ -110,6 +110,7 @@ peon status         # Check if paused or active
 peon packs          # List available sound packs
 peon pack <name>    # Switch to a specific pack
 peon pack           # Cycle to the next pack
+peon upgrade        # Self-update from GitHub releases
 ```
 
 Tab completion is supported — type `peon pack <TAB>` to see available pack names.
@@ -206,6 +207,16 @@ cargo xtask lint --install-hooks    # Install pre-commit hook
 cargo xtask lint --uninstall-hooks  # Remove pre-commit hook
 cargo xtask lint --hooks-status     # Check hook installation status
 ```
+
+### Releasing
+
+```bash
+cargo xtask release 2.1.0              # Full automated release
+cargo xtask release 2.1.0 --no-monitor # Skip workflow polling
+cargo xtask release --cleanup v2.1.0   # Clean up a failed release
+```
+
+The release command validates pre-flight checks (branch, clean dir, CI), bumps the workspace version, commits, tags, pushes, and monitors the release workflow. See [.claude/context/ci.md](.claude/context/ci.md) for details.
 
 ## Links
 

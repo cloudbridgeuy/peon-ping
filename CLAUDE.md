@@ -18,6 +18,7 @@ cargo build                    # Build all crates
 cargo test                     # Run all tests (unit + integration)
 cargo xtask lint               # All quality checks (fmt, check, clippy, test, file-length)
 cargo xtask lint --fix         # Auto-fix formatting
+cargo xtask release <version>  # Automated release (bump, tag, push, monitor CI)
 ```
 
 ## Conventions
@@ -42,7 +43,7 @@ cargo xtask lint --fix         # Auto-fix formatting
 `peon` with no args = hook mode (reads JSON from stdin). Subcommands:
 
 ```
-peon pause | resume | toggle | status | packs | pack [name]
+peon pause | resume | toggle | status | packs | pack [name] | upgrade [--force]
 ```
 
 ## Project Structure
@@ -58,11 +59,15 @@ scripts/uninstall.sh    # Uninstaller
 completions.bash        # Tab completion for bash/zsh
 config.json             # Default configuration
 skills/                 # Claude Code slash command (/peon-ping-toggle)
-xtask/                  # Dev tooling (lint, hooks)
+xtask/                  # Dev tooling (lint, hooks, release)
 ```
+
+## Versioning
+
+Workspace version is centralized in the root `Cargo.toml` under `[workspace.package]`. Both crates inherit via `version.workspace = true`. Only the root `Cargo.toml` needs to be bumped.
 
 ## Context Files
 
 - [Architecture & Event Pipeline](.claude/context/architecture.md)
 - [Sound Packs](.claude/context/sound-packs.md)
-- [CI/CD](.claude/context/ci.md)
+- [CI/CD & Release](.claude/context/ci.md)

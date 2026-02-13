@@ -38,6 +38,14 @@ pub enum Commands {
         /// Pack name to show. Omit for active pack.
         name: Option<String>,
     },
+    /// Play a random sound from a pack
+    Play {
+        /// Sound category (e.g., greeting, complete, annoyed). Omit for random.
+        category: Option<String>,
+        /// Pack to play from. Omit for active pack.
+        #[arg(long)]
+        pack: Option<String>,
+    },
     /// Self-update peon from GitHub releases
     Upgrade(upgrade::App),
 }

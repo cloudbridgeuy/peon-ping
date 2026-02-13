@@ -6,6 +6,7 @@ mod state_io;
 mod upgrade;
 
 use clap::Parser;
+use rand::Rng;
 use std::process::ExitCode;
 
 use cli::{Cli, Commands};
@@ -172,6 +173,70 @@ fn run_command(
             })?;
 
             print!("{}", peon_core::format_pack_sounds(&manifest));
+        }
+        Commands::Play { category, pack } => {
+            let packs_dir = paths::packs_dir(packs_dir_override.as_deref());
+            let config = state_io::load_config(&paths::config_path());
+
+            let pack_name = pack.unwrap_or(config.active_pack);
+            let pack_path = packs_dir.join(&pack_name);
+
+            let manifest = state_io::load_manifest(&pack_path).map_err(|_| {
+                let available = state_io::list_packs(&packs_dir);
+                let names: Vec<&str> = available.iter().map(|(n, _)| n.as_str()).collect();
+                format!(
+                    "pack \"{}\" not found. Available: {}",
+                    pack_name,
+                    if names.is_empty() {
+                        "(none)".to_string()
+                    } else {
+                        names.join(", ")
+                    }
+                )
+            })?;
+
+            if manifest.categories.is_empty() {
+                return Err(format!("pack \"{}\" has no categories", pack_name).into());
+            }
+
+            let mut rng = rand::thread_rng();
+
+            let cat = match category {
+                Some(ref cat_name) => {
+                    manifest.categories.get(cat_name.as_str()).ok_or_else(|| {
+                        let available: Vec<&str> =
+                            manifest.categories.keys().map(|k| k.as_str()).collect();
+                        format!(
+                            "category \"{}\" not found in pack \"{}\". Available: {}",
+                            cat_name,
+                            pack_name,
+                            available.join(", ")
+                        )
+                    })?
+                }
+                None => {
+                    let keys: Vec<&String> = manifest.categories.keys().collect();
+                    let idx = rng.gen_range(0..keys.len());
+                    &manifest.categories[keys[idx]]
+                }
+            };
+
+            match peon_core::pick_sound(&cat.sounds, None, &mut rng) {
+                Some(sound) => {
+                    println!("Playing: \"{}\" ({})", sound.line, sound.file);
+                    let sound_path = pack_path.join("sounds").join(&sound.file);
+                    if sound_path.exists() {
+                        platform::audio::play_sound(&sound_path, config.volume)?;
+                    } else {
+                        return Err(
+                            format!("sound file not found: {}", sound_path.display()).into()
+                        );
+                    }
+                }
+                None => {
+                    return Err("no sounds in category".into());
+                }
+            }
         }
     }
     Ok(())

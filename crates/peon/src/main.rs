@@ -3,6 +3,7 @@ mod hook;
 mod paths;
 mod platform;
 mod state_io;
+mod upgrade;
 
 use clap::Parser;
 use std::process::ExitCode;
@@ -91,6 +92,9 @@ fn run_command(command: Commands) -> Result<(), Box<dyn std::error::Error>> {
                     println!("  {name:24} {display}{marker}");
                 }
             }
+        }
+        Commands::Upgrade(app) => {
+            upgrade::run(app)?;
         }
         Commands::Pack { name } => {
             let config_path = paths::config_path();

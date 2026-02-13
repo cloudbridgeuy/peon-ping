@@ -1,3 +1,4 @@
+use crate::upgrade;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -27,4 +28,6 @@ pub enum Commands {
         /// Pack name to switch to. Omit to cycle to next pack.
         name: Option<String>,
     },
+    /// Self-update peon from GitHub releases
+    Upgrade(upgrade::App),
 }

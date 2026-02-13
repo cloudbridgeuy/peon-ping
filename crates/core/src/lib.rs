@@ -1,6 +1,7 @@
 #![cfg_attr(not(test), deny(clippy::unwrap_used))]
 
 pub mod types;
+pub mod upgrade;
 
 mod agent;
 mod annoyed;

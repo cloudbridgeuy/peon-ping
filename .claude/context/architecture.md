@@ -30,6 +30,7 @@ I/O boundary — reads stdin, calls core, executes platform commands:
 | `paths` | Runtime path resolution (`CLAUDE_PEON_DIR`, `PEON_PACKS` overrides) |
 | `platform/audio` | `play_sound()` — afplay (mac) / PowerShell (WSL) |
 | `platform/notification` | `send_notification()` — AppleScript / WinForms |
+| `github` | `list_remote_packs()`, `pull_pack()` — GitHub Contents API |
 | `platform/focus` | `terminal_is_focused()` — frontmost app check |
 
 ## Event Pipeline

@@ -19,6 +19,7 @@ cargo test                     # Run all tests (unit + integration)
 cargo xtask lint               # All quality checks (fmt, check, clippy, test, file-length)
 cargo xtask lint --fix         # Auto-fix formatting
 cargo xtask release <version>  # Automated release (bump, tag, push, monitor CI)
+cargo xtask docs               # Generate SOUNDS.md from pack manifests
 ```
 
 ## Conventions
@@ -44,7 +45,7 @@ cargo xtask release <version>  # Automated release (bump, tag, push, monitor CI)
 `peon` with no args = hook mode (reads JSON from stdin). Subcommands:
 
 ```
-peon pause | resume | toggle | status | packs | pack [name] | sounds [pack] | play [category] [--pack name] | upgrade [--force]
+peon pause | resume | toggle | status | packs | pack [name] | sounds [pack] | play [category] [--pack name] | pull <pack> [--all] | upgrade [--force]
 peon --packs-dir <path> <subcommand>  # override packs directory
 ```
 
@@ -60,8 +61,9 @@ scripts/uninstall.sh    # Uninstaller
 .github/                # CI/CD workflows, dependabot
 completions.bash        # Tab completion for bash/zsh
 config.json             # Default configuration
+SOUNDS.md               # Generated pack catalog (cargo xtask docs)
 skills/                 # Claude Code slash command (/peon-ping-toggle)
-xtask/                  # Dev tooling (lint, hooks, release)
+xtask/                  # Dev tooling (lint, hooks, release, docs)
 ```
 
 ## Versioning

@@ -37,13 +37,15 @@ cargo xtask release <version>  # Automated release (bump, tag, push, monitor CI)
 | `~/.claude/hooks/peon-ping/.paused` | Presence = sounds muted |
 | `~/.claude/hooks/peon-ping/packs/` | Installed sound packs |
 | `CLAUDE_PEON_DIR` env var | Overrides base dir (used in tests) |
+| `PEON_PACKS` env var | Overrides packs dir only (dev: `PEON_PACKS=./packs`) |
 
 ## CLI
 
 `peon` with no args = hook mode (reads JSON from stdin). Subcommands:
 
 ```
-peon pause | resume | toggle | status | packs | pack [name] | upgrade [--force]
+peon pause | resume | toggle | status | packs | pack [name] | sounds [pack] | upgrade [--force]
+peon --packs-dir <path> <subcommand>  # override packs directory
 ```
 
 ## Project Structure

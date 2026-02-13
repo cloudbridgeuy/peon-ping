@@ -13,6 +13,7 @@ All logic is deterministic and testable without I/O:
 | `agent` | `is_agent_session()` — detects delegate/agent sessions |
 | `annoyed` | `check_annoyed()` — rapid prompt easter egg detection |
 | `pack` | `resolve_pack()` — pack rotation with session pinning |
+| `sounds` | `format_pack_sounds()` — human-readable pack catalog |
 | `tab_title` | `build_tab_title()` — formats terminal tab titles |
 | `types/` | `HookEvent`, `Action`, `Config`, `State`, `Manifest` |
 
@@ -26,7 +27,7 @@ I/O boundary — reads stdin, calls core, executes platform commands:
 | `cli` | `Cli` struct and `Commands` enum |
 | `hook` | `handle_hook()` — the main event pipeline |
 | `state_io` | Load/save config, state, manifests |
-| `paths` | Runtime path resolution (`CLAUDE_PEON_DIR` override) |
+| `paths` | Runtime path resolution (`CLAUDE_PEON_DIR`, `PEON_PACKS` overrides) |
 | `platform/audio` | `play_sound()` — afplay (mac) / PowerShell (WSL) |
 | `platform/notification` | `send_notification()` — AppleScript / WinForms |
 | `platform/focus` | `terminal_is_focused()` — frontmost app check |
@@ -81,3 +82,4 @@ Save state (if dirty)
 
 - **Unit tests** in `peon_core` — test routing, sound picking, agent detection, annoyed logic
 - `CLAUDE_PEON_DIR` env var isolates tests from real config
+- `PEON_PACKS` env var overrides packs directory (dev: `PEON_PACKS=./packs`)

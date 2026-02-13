@@ -16,6 +16,71 @@ curl -fsSL https://raw.githubusercontent.com/tonyyont/peon-ping/main/scripts/ins
 
 One command. Takes 10 seconds. macOS and WSL2 (Windows). Re-run to update (sounds and config preserved).
 
+### Manual setup
+
+If you prefer to set things up by hand (or the installer doesn't work for your environment):
+
+1. **Build the binary** and put it on your `$PATH`:
+   ```bash
+   cargo build --release
+   cp target/release/peon /usr/local/bin/peon
+   ```
+
+2. **Create the directory structure:**
+   ```bash
+   mkdir -p ~/.claude/hooks/peon-ping/packs
+   ```
+
+3. **Copy the default config:**
+   ```bash
+   cp config.json ~/.claude/hooks/peon-ping/config.json
+   ```
+
+4. **Install sound packs** — copy the packs you want:
+   ```bash
+   cp -r packs/* ~/.claude/hooks/peon-ping/packs/
+   ```
+
+5. **Initialize state:**
+   ```bash
+   echo '{}' > ~/.claude/hooks/peon-ping/.state.json
+   ```
+
+6. **Register hooks** — add the following to `~/.claude/settings.json` (create the file if it doesn't exist). If the file already has a `hooks` key, merge these entries into it:
+   ```json
+   {
+     "hooks": {
+       "SessionStart": [
+         { "matcher": "", "hooks": [{ "type": "command", "command": "peon", "timeout": 10 }] }
+       ],
+       "UserPromptSubmit": [
+         { "matcher": "", "hooks": [{ "type": "command", "command": "peon", "timeout": 10 }] }
+       ],
+       "Stop": [
+         { "matcher": "", "hooks": [{ "type": "command", "command": "peon", "timeout": 10 }] }
+       ],
+       "Notification": [
+         { "matcher": "", "hooks": [{ "type": "command", "command": "peon", "timeout": 10 }] }
+       ],
+       "PermissionRequest": [
+         { "matcher": "", "hooks": [{ "type": "command", "command": "peon", "timeout": 10 }] }
+       ]
+     }
+   }
+   ```
+
+7. **Optional — tab completions:**
+   ```bash
+   cp completions.bash ~/.claude/hooks/peon-ping/
+   echo '[ -f ~/.claude/hooks/peon-ping/completions.bash ] && source ~/.claude/hooks/peon-ping/completions.bash' >> ~/.zshrc
+   ```
+
+8. **Optional — slash command** (`/peon-ping-toggle`):
+   ```bash
+   mkdir -p ~/.claude/skills/peon-ping-toggle
+   cp skills/peon-ping-toggle/SKILL.md ~/.claude/skills/peon-ping-toggle/
+   ```
+
 ## What you'll hear
 
 | Event | Sound | Examples |

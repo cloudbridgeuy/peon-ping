@@ -5,6 +5,7 @@ use std::path::PathBuf;
 #[derive(Parser, Debug)]
 #[command(
     name = "peon",
+    version,
     about = "Warcraft III Peon voice lines for Claude Code hooks"
 )]
 pub struct Cli {

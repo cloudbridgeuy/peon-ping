@@ -36,9 +36,11 @@ If you prefer to set things up by hand (or the installer doesn't work for your e
    cp config.json ~/.claude/hooks/peon-ping/config.json
    ```
 
-4. **Install sound packs** — copy the packs you want:
+4. **Install sound packs** — either copy from a local clone or pull from GitHub:
    ```bash
-   cp -r packs/* ~/.claude/hooks/peon-ping/packs/
+   cp -r packs/* ~/.claude/hooks/peon-ping/packs/   # from local clone
+   # or
+   peon pull --all                                   # download from GitHub
    ```
 
 5. **Initialize state:**
@@ -104,16 +106,22 @@ Need to mute sounds and notifications during a meeting or pairing session? Two o
 Other CLI commands:
 
 ```bash
-peon pause          # Mute sounds
-peon resume         # Unmute sounds
-peon status         # Check if paused or active
-peon packs          # List available sound packs
-peon pack <name>    # Switch to a specific pack
-peon pack           # Cycle to the next pack
-peon upgrade        # Self-update from GitHub releases
+peon pause                        # Mute sounds
+peon resume                       # Unmute sounds
+peon status                       # Check if paused or active
+peon packs                        # List available sound packs
+peon pack <name>                  # Switch to a specific pack
+peon pack                         # Cycle to the next pack
+peon sounds [pack]                # Show categories and voice lines for a pack
+peon play [category] [--pack name]  # Play a random sound preview
+peon pull <pack>                  # Download a pack from GitHub
+peon pull --all                   # Download all available packs
+peon upgrade                      # Self-update from GitHub releases
 ```
 
-Tab completion is supported — type `peon pack <TAB>` to see available pack names.
+The `--packs-dir <path>` flag works with any subcommand to override the packs directory. The `PEON_PACKS` environment variable does the same (useful for development: `PEON_PACKS=./packs peon sounds`).
+
+Tab completion is supported — type `peon <TAB>` to see available subcommands.
 
 Pausing mutes sounds and desktop notifications instantly. Persists across sessions until you resume. Tab titles remain active when paused.
 
@@ -153,13 +161,19 @@ Edit `~/.claude/hooks/peon-ping/config.json`:
 | `sc_battlecruiser` | Battlecruiser (StarCraft) | "Battlecruiser operational", "Make it happen", "Engage" | [@garysheng](https://github.com/garysheng) |
 | `sc_kerrigan` | Sarah Kerrigan (StarCraft) | "I gotcha", "What now?", "Easily amused, huh?" | [@garysheng](https://github.com/garysheng) |
 
-Switch packs from the CLI:
+Manage packs from the CLI:
 
 ```bash
+peon packs                      # list all installed packs
 peon pack ra2_soviet_engineer   # switch to a specific pack
 peon pack                       # cycle to the next pack
-peon packs                      # list all packs
+peon sounds peasant             # preview all voice lines in a pack
+peon play greeting --pack peon  # hear a random greeting from the peon pack
+peon pull sc_kerrigan           # download a pack from GitHub
+peon pull --all                 # download all available packs
 ```
+
+See [SOUNDS.md](SOUNDS.md) for a full catalog of every pack's categories and voice lines.
 
 Or edit `~/.claude/hooks/peon-ping/config.json` directly:
 
@@ -198,6 +212,7 @@ cargo build              # Build all crates
 cargo test               # Run all tests
 cargo xtask lint         # Run all quality checks (fmt, check, clippy, test, file-length)
 cargo xtask lint --fix   # Auto-fix formatting issues
+cargo xtask docs         # Generate SOUNDS.md from pack manifests
 ```
 
 Pre-commit hooks:

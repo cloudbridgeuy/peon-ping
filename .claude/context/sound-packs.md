@@ -50,9 +50,21 @@ Config supports `pack_rotation` array. When non-empty, each Claude Code session 
 
 Empty array (`[]`) falls back to `active_pack`.
 
+## Discovering & Previewing Packs
+
+```bash
+peon packs                          # list installed packs
+peon sounds peasant                 # show all categories and voice lines
+peon play greeting --pack peon      # hear a random greeting
+peon pull sc_kerrigan               # download a pack from GitHub
+peon pull --all                     # download all available packs
+```
+
+See [SOUNDS.md](/SOUNDS.md) for a full catalog of every pack. Regenerate with `cargo xtask docs`.
+
 ## Adding a Pack
 
 1. Create `packs/<name>/manifest.json` and `packs/<name>/sounds/`
-2. Add pack name to `PACKS` variable in `install.sh`
-3. Bump `VERSION` (patch for new packs)
+2. Run `cargo xtask docs` to regenerate SOUNDS.md
+3. Bump version (patch for new packs)
 4. See `CONTRIBUTING.md` for full guide

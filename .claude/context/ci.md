@@ -62,6 +62,6 @@ cargo xtask release --cleanup v2.1.0   # Clean up a failed release
 
 Users can self-update via `peon upgrade` (or `peon upgrade --force`). Downloads the matching binary from the latest GitHub release and replaces the current executable with rollback on failure. Uses `ureq` (blocking HTTP) against the GitHub releases API.
 
-**GitHub repo**: `tonyyont/peon-ping`
-**API endpoint**: `https://api.github.com/repos/tonyyont/peon-ping/releases/latest`
+**GitHub repo**: `cloudbridgeuy/peon-ping`
+**API endpoint**: `https://api.github.com/repos/cloudbridgeuy/peon-ping/releases/latest`
 **Asset pattern**: `peon-{arch}-apple-darwin` (must match `release.yml` matrix)

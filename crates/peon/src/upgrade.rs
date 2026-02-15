@@ -4,7 +4,7 @@ use peon_core::upgrade::{
 use std::io::Read;
 use std::path::PathBuf;
 
-const GITHUB_API_URL: &str = "https://api.github.com/repos/tonyyont/peon-ping/releases/latest";
+const GITHUB_API_URL: &str = "https://api.github.com/repos/cloudbridgeuy/peon-ping/releases/latest";
 
 /// Self-update peon from GitHub releases
 #[derive(Debug, clap::Parser)]

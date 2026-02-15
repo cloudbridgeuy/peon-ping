@@ -3,7 +3,7 @@ use error::{ReleaseError, Result};
 
 pub mod error;
 
-const GITHUB_REPO: &str = "tonyyont/peon-ping";
+const GITHUB_REPO: &str = "cloudbridgeuy/peon-ping";
 const WORKFLOW_FILE: &str = "release.yml";
 const WORKFLOW_CHECK_INTERVAL: u64 = 30;
 const WORKFLOW_TIMEOUT: u64 = 1800;

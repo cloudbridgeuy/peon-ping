@@ -3,7 +3,7 @@
 use std::io::Read;
 use std::path::Path;
 
-const GITHUB_API_BASE: &str = "https://api.github.com/repos/tonyyont/peon-ping/contents/packs";
+const GITHUB_API_BASE: &str = "https://api.github.com/repos/cloudbridgeuy/peon-ping/contents/packs";
 
 #[derive(thiserror::Error, Debug)]
 pub enum GithubError {

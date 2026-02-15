@@ -6,7 +6,7 @@ set -euo pipefail
 
 INSTALL_DIR="$HOME/.claude/hooks/peon-ping"
 SETTINGS="$HOME/.claude/settings.json"
-REPO="stuctf/peon-ping"
+REPO="cloudbridgeuy/peon-ping"
 REPO_BASE="https://raw.githubusercontent.com/$REPO/main"
 BIN_NAME="peon"
 

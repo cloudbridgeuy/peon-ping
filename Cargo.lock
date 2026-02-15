@@ -568,7 +568,7 @@ dependencies = [
 
 [[package]]
 name = "peon"
-version = "3.0.0"
+version = "3.0.1"
 dependencies = [
  "clap",
  "dirs",
@@ -582,7 +582,7 @@ dependencies = [
 
 [[package]]
 name = "peon_core"
-version = "3.0.0"
+version = "3.0.1"
 dependencies = [
  "rand",
  "serde",

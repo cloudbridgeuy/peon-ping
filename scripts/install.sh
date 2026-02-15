@@ -10,9 +10,6 @@ REPO="stuctf/peon-ping"
 REPO_BASE="https://raw.githubusercontent.com/$REPO/main"
 BIN_NAME="peon"
 
-# All available sound packs (add new packs here)
-PACKS="peon peon_fr peon_pl peasant peasant_fr ra2_soviet_engineer sc_battlecruiser sc_kerrigan"
-
 # --- macOS guard ---
 if [ "$(uname -s)" != "Darwin" ]; then
   echo "Error: peon-ping requires macOS"
@@ -102,10 +99,7 @@ else
 fi
 
 # --- Install sound packs ---
-for pack in $PACKS; do
-  mkdir -p "$INSTALL_DIR/packs/$pack/sounds"
-done
-
+mkdir -p "$INSTALL_DIR/packs"
 if [ -n "$SCRIPT_DIR" ]; then
   # Local clone — copy files directly (including sounds)
   cp -r "$SCRIPT_DIR/packs/"* "$INSTALL_DIR/packs/"
@@ -115,24 +109,11 @@ if [ -n "$SCRIPT_DIR" ]; then
     cp "$SCRIPT_DIR/config.json" "$INSTALL_DIR/"
   fi
 else
-  # curl|bash — download from GitHub
+  # curl|bash — use peon to pull packs from GitHub
   echo "Downloading sound packs..."
+  "$BIN_DIR/$BIN_NAME" pull --all --packs-dir "$INSTALL_DIR/packs"
   curl -fsSL "$REPO_BASE/completions.bash" -o "$INSTALL_DIR/completions.bash"
   curl -fsSL "$REPO_BASE/scripts/uninstall.sh" -o "$INSTALL_DIR/uninstall.sh"
-  for pack in $PACKS; do
-    curl -fsSL "$REPO_BASE/packs/$pack/manifest.json" -o "$INSTALL_DIR/packs/$pack/manifest.json"
-  done
-  # Download sound files from manifests using jq or grep fallback
-  for pack in $PACKS; do
-    manifest="$INSTALL_DIR/packs/$pack/manifest.json"
-    if command -v jq &>/dev/null; then
-      jq -r '.categories[].sounds[].file' "$manifest" 2>/dev/null | sort -u
-    else
-      grep -o '"file"[[:space:]]*:[[:space:]]*"[^"]*"' "$manifest" | sed 's/"file"[[:space:]]*:[[:space:]]*"//;s/"$//' | sort -u
-    fi | while read -r sfile; do
-      curl -fsSL "$REPO_BASE/packs/$pack/sounds/$sfile" -o "$INSTALL_DIR/packs/$pack/sounds/$sfile" </dev/null
-    done
-  done
   if [ "$UPDATING" = false ]; then
     curl -fsSL "$REPO_BASE/config.json" -o "$INSTALL_DIR/config.json"
   fi
@@ -159,9 +140,10 @@ done
 
 # --- Verify sounds are installed ---
 echo ""
-for pack in $PACKS; do
-  sound_dir="$INSTALL_DIR/packs/$pack/sounds"
-  sound_count=$({ ls "$sound_dir"/*.wav "$sound_dir"/*.mp3 "$sound_dir"/*.ogg 2>/dev/null || true; } | wc -l | tr -d ' ')
+for pack_dir in "$INSTALL_DIR/packs"/*/; do
+  [ -d "$pack_dir" ] || continue
+  pack=$(basename "$pack_dir")
+  sound_count=$({ ls "$pack_dir/sounds/"*.wav "$pack_dir/sounds/"*.mp3 "$pack_dir/sounds/"*.ogg 2>/dev/null || true; } | wc -l | tr -d ' ')
   if [ "$sound_count" -eq 0 ]; then
     echo "[$pack] Warning: No sound files found!"
   else

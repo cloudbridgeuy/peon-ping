@@ -33,7 +33,7 @@ jobs:
       - name: Strip binary
         run: strip target/${{ matrix.target }}/release/peon
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.asset_name }}
           path: target/${{ matrix.target }}/release/peon

@@ -24,7 +24,7 @@ rand = "0.8"
 dirs = "6.0"
 anstream = "1.0"
 chrono = "0.4"
-tokio = { version = "1.0", features = ["full"] }
+tokio = { version = "1.50", features = ["full"] }
 regex = "1"
 ureq = { version = "2", features = ["json"] }
 peon_core = { path = "crates/core" }
